@@ -1,11 +1,12 @@
 import request from '@/api/index'
 
-export const doLogin = () => {
+export const doLogin = (data) => {
   const url = '/api/auth/login'
   const method = 'post'
   return request({
     method,
     url,
+    data,
   })
 }
 

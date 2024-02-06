@@ -34,7 +34,7 @@
                         </template>
                     </el-input>
                 </el-form-item> -->
-                <el-form-item label="" prop="checkNum">
+                <!-- <el-form-item label="" prop="checkNum">
                     <el-input placeholder="驗證碼" maxlength="4" v-model="form.checkNum"
                         style="width: 50%;min-width:220px;max-width:300px;height: 40px;font-size: 18px;">
                         <template #prepend>
@@ -46,7 +46,7 @@
                             </div>
                         </template>
                     </el-input>
-                </el-form-item>
+                </el-form-item> -->
             </el-form>
             <div class="w-full min-h-[15px] text-red-600 text-sm md:text-lg flex flex-wrap justify-center items-center">
                 {{loginMessage || ''}}
@@ -77,20 +77,10 @@ const isMobile = computed(() => {
 
 const captchaData = ref({})
 const setCaptcha = () => {
-    // getCaptcha().then((res) => {
-    //     // console.log('res',res)
-    //     if(res.data.status){
-    //         captchaData.value = res.data.data
-    //         // console.log('captchaData',captchaData.value)
-    //     }else{
-    //         console.log(res.data.message)
-    //     }
-    // })
 }
 const init = () => {
     headerStore.closeHeader()
     menuStore.closeMenu()
-    setCaptcha()
 }
 
 init()
@@ -99,7 +89,7 @@ const formItem = ref(null)
 const form = ref({
   account: '',
   password: '',
-  checkNum:''
+//   checkNum:''
   // phone: '',
 })
 
@@ -112,10 +102,10 @@ const rules = ref({
         { required: true, message: '請輸入密碼', trigger: 'blur' },
         { min: 3, max: 15, message: 'Length should be 3 to 15', trigger: 'change' },
     ],
-    checkNum: [
-        { required: true,message: '請輸入驗證碼',trigger: 'blur' },
-        { min: 4, message: 'Length should be 4', trigger: 'change' },
-    ],
+    // checkNum: [
+    //     { required: true,message: '請輸入驗證碼',trigger: 'blur' },
+    //     { min: 4, message: 'Length should be 4', trigger: 'change' },
+    // ],
 })
 
 // const accountCheck = (rule, value, callback) => {
@@ -181,12 +171,17 @@ const login = async() => {
   const formData = new FormData();
   formData.append("account", form.value?.account);
   formData.append("password", form.value?.password);
-  formData.append("captchaId", captchaData.value?.captchaId);
-  formData.append("captchaCode", form.value?.checkNum);
+  const payLoad = {
+    account:form.value?.account,
+    password:form.value?.password
+  }
+//   formData.append("captchaId", captchaData.value?.captchaId);
+//   formData.append("captchaCode", form.value?.checkNum);
 
-  await doLogin(formData).then((res) => {
+  await doLogin(payLoad).then((res) => {
+      console.log('doLogin',res)
       if(res.data.status){
-          loginStore.setToken(res.data.data)
+          loginStore.setToken(res.data.data.access_token)
           resetForm()
           if(!isMobile.value){
             menuStore.openMenu()

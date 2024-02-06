@@ -23,9 +23,10 @@
 import { RouterLink, RouterView } from 'vue-router'
 import { onMounted,computed,watch } from 'vue'
 // import HelloWorld from './components/HelloWorld.vue'
+import { loginInformation } from '@/api/login'
 import headerView from './components/headerView.vue'
 import menuView from './components/menuView.vue'
-import { useMobileStore,useMenuStore,useheaderStore,useAnnounceStore,useLoginStore } from './stores/index'
+import { useMobileStore,useMenuStore,useheaderStore,useAnnounceStore,useLoginStore,useUserStore } from './stores/index'
 import { useRouter } from "vue-router";
 
 const router = useRouter()
@@ -34,6 +35,7 @@ const menuStore = useMenuStore()
 const headerStore = useheaderStore()
 const announceStore = useAnnounceStore()
 const loginStore = useLoginStore()
+const userStore = useUserStore()
 
 const headerStatus = computed(() => {
   return headerStore.status
@@ -52,7 +54,7 @@ const init = () => {
   if(!localStorage.getItem('lotteryToken')){
     router.push({ path: '/loginView' })
   }else{
-    loginStore.isLogin()
+    loginStore.setIsLogin()
     router.push({ path: '/' })
   }
 }
@@ -62,6 +64,15 @@ onMounted(() => {
   setWidth()
 
   if(loginStore.status){
+    loginInformation().then((res) => {
+      console.log('loginInformation',res)
+      if(res.data.status){
+        userStore.setUserInformation(res.data.data)
+        console.log('userStore',userStore.information)
+      }
+      
+    })
+
     headerStore.openHeader()
     if(!isMobile.value){
       menuStore.openMenu()

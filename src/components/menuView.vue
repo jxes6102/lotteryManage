@@ -84,10 +84,6 @@ const urlData = ref([
     //         },
     //     ]
     // },
-    // {
-    //     name:'接送畫面',
-    //     url:'/announcementView'
-    // },
     {
         name:'使用者管理',
         icon:'User',
@@ -114,17 +110,12 @@ const toLink = async(url) => {
         if(url=='/loginView'){
 
             await doLoginOut().then((res) => {
-                // console.log('res',res)
+                console.log('doLoginOut',res)
                 loginStore.clearToken()
                 userStore.clearUserInformation()
                 router.push({path:'/loginView'})
             })
 
-            return false
-        }
-
-        if(url == '/announcementView'){
-            announceStore.openAnnounce()
             return false
         }
 

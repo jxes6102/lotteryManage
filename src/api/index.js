@@ -50,8 +50,7 @@ instance.interceptors.response.use(
   },
   error => {
     // console.log('interceptors.response error',error)
-    if(error.response.status == 401){
-      // console.log('未允許拿取')
+    if(error.response?.status == 401){
       const loginStore = useLoginStore()
       const userStore = useUserStore()
       loginStore.clearToken()
@@ -59,6 +58,14 @@ instance.interceptors.response.use(
       let returnUrl = '#/loginView'
       window.location.replace((window.location.origin + window.location.pathname+returnUrl))
     }
+
+    // const loginStore = useLoginStore()
+    // const userStore = useUserStore()
+    // loginStore.clearToken()
+    // userStore.clearUserInformation()
+    // let returnUrl = '#/loginView'
+    // window.location.replace((window.location.origin + window.location.pathname+returnUrl))
+
     return Promise.reject(error);
   }
 );

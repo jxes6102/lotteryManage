@@ -60,7 +60,7 @@ export const useAnnounceStore = defineStore('announce', () => {
 
 export const useLoginStore = defineStore('login', () => {
     const status = ref(false)
-    const isLogin = () => {
+    const setIsLogin = () => {
         status.value = true
     }
     const setToken = (value) => {
@@ -71,7 +71,7 @@ export const useLoginStore = defineStore('login', () => {
         status.value = false
         localStorage.removeItem("lotteryToken")
     }
-    return { status,setToken,clearToken,isLogin }
+    return { status,setToken,clearToken,setIsLogin }
 })
 
 export const useUserStore = defineStore('user', () => {
