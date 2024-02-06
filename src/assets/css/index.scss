@@ -1,0 +1,17 @@
+@media screen and (max-width: 330px) {
+    .custom-date-picker { 
+        .el-date-picker{
+            width: 200px !important;
+            .el-picker-panel__content {
+                width: 175px !important;
+            }
+        }
+    }
+}
+
+.line-style:before,.line-style:after {
+    content: "";
+    flex: 1 1;
+    border-bottom: 2px solid #D3D3D3;
+    margin: auto;
+}
