@@ -109,12 +109,11 @@ const toLink = async(url) => {
     if(url){
         if(url=='/loginView'){
 
-            await doLoginOut().then((res) => {
-                console.log('doLoginOut',res)
+            await doLoginOut().finally(()=>{
                 loginStore.clearToken()
                 userStore.clearUserInformation()
                 router.push({path:'/loginView'})
-            })
+            });
 
             return false
         }

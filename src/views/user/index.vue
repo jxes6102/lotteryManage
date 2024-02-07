@@ -1,5 +1,5 @@
 <template>
-    <div 
+    <div
         class="w-full h-[100vh] flex flex-col justify-start items-start"
     >
         <div class="w-full my-3 px-3 text-3xl flex flex-wrap justify-start items-center">
@@ -8,111 +8,51 @@
         <div class="line-style w-[100%] text-[#D3D3D3] flex"></div>
         <div class="w-full md:w-[80%] my-2 p-1 md:p-2 rounded-md ">
             <el-form :inline="!isMobile" :model="form" label-width="80px">
-                <!-- <el-form-item label="集團">
-                    <el-col :span="24">
-                        <el-input
-                            disabled
-                            v-model="form.name"
-                            placeholder=""
-                            class="input-with-select"
-                            >
-                            <template #append>
-                                <el-button
-                                    @click="openSelect" 
-                                    style="background-color: #409eff;color:white;">
-                                    選擇
-                                </el-button>
-                            </template>
-                        </el-input>
-                    </el-col>
-                </el-form-item>
-                <el-form-item label="機構">
-                    <el-col :span="24">
-                        <el-select
-                            :style="isMobile ? 'width: 100%;font-size: 14px;' : ''"
-                            v-model="form.region" 
-                            placeholder="">
-                            <el-option label="Zone one" value="shanghai" />
-                            <el-option label="Zone two" value="beijing" />
-                        </el-select>
-                    </el-col>
-                </el-form-item> -->
-                <el-form-item label="關鍵字">
-                    <el-col :span="isMobile ? 22 : 24">
-                        <el-input placeholder="請輸入" v-model="form.keyWord" />
-                    </el-col>
-                </el-form-item>
                 <el-form-item>
                     <el-col :span="24">
-                        <el-button class="mx-1" type="primary" @click="onSubmit">查詢</el-button>
+                        <el-button class="mx-1" type="primary" @click="createUser">新增</el-button>
                     </el-col>
                 </el-form-item>
             </el-form>
         </div>
         <div class="line-style w-[100%] text-[#D3D3D3] flex"></div>
         <div class="w-full md:w-[75%] lg:w-[80%] h-auto my-1 px-2 py-1 flex flex-wrap justify-center items-center">
-            <el-table 
+            <el-table
                 :row-class-name="tableRowClassName"
-                :data="userList" 
+                :data="userList"
                 style="width: 100%;font-size:16px;">
                 <el-table-column prop="account" >
-                    <template #header="scope">
+                    <template #header>
                         <div class="flex flex-wrap">
-                            <div class="cursor-pointer" @click="sortCol(scope.column.property)">帳號</div>
-                            <el-icon class="ml-[1px] md:ml-1 cursor-pointer" @click="sortSize(scope.column.property)" :size="20">
+                            <div class="cursor-pointer">帳號</div>
+                            <!-- <el-icon class="ml-[1px] md:ml-1 cursor-pointer" @click="sortSize(scope.column.property)" :size="20">
                                 <Sort />
-                            </el-icon>
+                            </el-icon> -->
                         </div>
                     </template>
                     <template #default="scope">
                         <div class="truncate">{{ scope.row.account }}</div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="gender" >
-                    <template #header="scope">
-                        <div class="flex flex-wrap">
-                            <div class="cursor-pointer" @click="sortCol(scope.column.property)">性別</div>
-                            <el-icon class="ml-[1px] md:ml-1 cursor-pointer" @click="sortSize(scope.column.property)" :size="20">
-                                <Sort />
-                            </el-icon>
-                        </div>
-                    </template>
-                    <template #default="scope">
-                        <div class="truncate">{{ scope.row.gender }}</div>
-                    </template>
-                </el-table-column>
                 <el-table-column prop="name" >
-                    <template #header="scope">
+                    <template #header>
                         <div class="flex flex-wrap">
-                            <div class="cursor-pointer" @click="sortCol(scope.column.property)">姓名</div>
-                            <el-icon class="ml-[1px] md:ml-1 cursor-pointer" @click="sortSize(scope.column.property)" :size="20">
+                            <div class="cursor-pointer">姓名</div>
+                            <!-- <el-icon class="ml-[1px] md:ml-1 cursor-pointer" @click="sortSize(scope.column.property)" :size="20">
                                 <Sort />
-                            </el-icon>
+                            </el-icon> -->
                         </div>
-                    </template> 
+                    </template>
                     <template #default="scope">
                         <div class="truncate">{{ scope.row.name }}</div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="nickName" >
-                    <template #header="scope">
-                        <div class="flex flex-wrap">
-                            <div class="cursor-pointer" @click="sortCol(scope.column.property)">暱稱</div>
-                            <el-icon class="ml-[1px] md:ml-1 cursor-pointer" @click="sortSize(scope.column.property)" :size="20">
-                                <Sort />
-                            </el-icon>
-                        </div>
-                    </template>
+                <el-table-column prop="state" label="身分" >
                     <template #default="scope">
-                        <div class="truncate">{{ scope.row.nickName }}</div>
+                        <div class="truncate">{{ transformRole(scope.row.state) }}</div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="roleName" label="身分" > 
-                    <template #default="scope">
-                        <div class="truncate">{{ scope.row.roleName }}</div>
-                    </template>
-                </el-table-column>
-                <el-table-column width="90" label="操作" > 
+                <el-table-column width="90" label="操作" >
                     <template #default="scope">
                         <div class="truncate">
                             <el-button class="mx-1" type="primary" @click="editUser(scope)">編輯</el-button>
@@ -138,71 +78,17 @@
             {{ '共' + totalCount + '筆資料' }}
         </div>
 
-        <choseGroup @close="cancel" v-if="groupStatus"></choseGroup>
-
         <Teleport to="body">
-            <dialogView @close="cancel" v-if="editStatus">
+            <dialogView type="auto" @close="cancel" v-if="editStatus">
                 <template v-slot:title>
-                    <div class="w-full my-[1px] md:my-1 px-2 py-[1px] md:py-1 text-2xl">編輯使用者</div>
+                    <div class="w-full my-[1px] md:my-1 px-2 py-[1px] md:py-1 text-2xl">
+                        {{ mode == 1 ? '新增使用者' : '編輯使用者' }}
+                    </div>
                     <div class="line-style w-[100%] text-[#D3D3D3] flex"></div>
                 </template>
                 <template v-slot:message>
                     <div class="w-[100%] h-auto flex flex-wrap justify-center items-center overflow-x-hidden overflow-y-auto">
                         <el-form :inline="false" label-position="top" :model="userData" label-width="60px" style="width:100%;padding:10px 5px;">
-                            <el-form-item label="帳號">
-                                <el-col :span="1"></el-col>
-                                <el-col :span="22">
-                                    <el-input :disabled="true" placeholder="" v-model="userData.account" />
-                                </el-col>
-                                <el-col :span="1"></el-col>
-                            </el-form-item>
-                            <el-form-item label="生日">
-                                <el-col :span="1"></el-col>
-                                <el-col :span="22">
-                                    <el-date-picker
-                                        popper-class="custom-date-picker"
-                                        v-model="userData.birthday"
-                                        type="date"
-                                        placeholder="Pick a date"
-                                        :default-value="new Date()"
-                                        style="width: 100%;font-size: 14px;"
-                                    />
-                                    <!-- <el-input placeholder="" v-model="userData.birthday" /> -->
-                                </el-col>
-                                <el-col :span="1"></el-col>
-                            </el-form-item>
-                            <el-form-item label="電子郵件">
-                                <el-col :span="1"></el-col>
-                                <el-col :span="22">
-                                    <el-input disabled placeholder="" v-model="userData.email" />
-                                </el-col>
-                                <el-col :span="1"></el-col>
-                            </el-form-item>
-                            <el-form-item label="性別">
-                                <el-col :span="1"></el-col>
-                                <el-col :span="22">
-                                    <el-select
-                                        style="width: 100%;font-size: 14px;"
-                                        v-model="userData.gender" 
-                                        placeholder="">
-                                        <el-option label="男" value="男" />
-                                        <el-option label="女" value="女" />
-                                    </el-select>
-                                </el-col>
-                                <el-col :span="1"></el-col>
-                            </el-form-item>
-                            <!-- <el-form-item label="userdID">
-                                <el-col :span="24">
-                                    <el-input placeholder="" v-model="userData.id" />
-                                </el-col>
-                            </el-form-item> -->
-                            <!-- <el-form-item label="lineID">
-                                <el-col :span="1"></el-col>
-                                <el-col :span="22">
-                                    <el-input placeholder="" v-model="userData.lineId" />
-                                </el-col>
-                                <el-col :span="1"></el-col>
-                            </el-form-item> -->
                             <el-form-item label="姓名">
                                 <el-col :span="1"></el-col>
                                 <el-col :span="22">
@@ -210,17 +96,24 @@
                                 </el-col>
                                 <el-col :span="1"></el-col>
                             </el-form-item>
-                            <el-form-item label="暱稱">
+                            <el-form-item v-if="mode==1" label="帳號">
                                 <el-col :span="1"></el-col>
                                 <el-col :span="22">
-                                    <el-input placeholder="" v-model="userData.nickName" />
+                                    <el-input placeholder="" v-model="userData.account" />
                                 </el-col>
                                 <el-col :span="1"></el-col>
                             </el-form-item>
-                            <el-form-item label="電話">
+                            <el-form-item label="密碼">
                                 <el-col :span="1"></el-col>
                                 <el-col :span="22">
-                                    <el-input placeholder="" v-model="userData.phone" />
+                                    <el-input placeholder="" v-model="userData.password" />
+                                </el-col>
+                                <el-col :span="1"></el-col>
+                            </el-form-item>
+                            <el-form-item label="確認密碼">
+                                <el-col :span="1"></el-col>
+                                <el-col :span="22">
+                                    <el-input placeholder="" v-model="userData.confirm_password" />
                                 </el-col>
                                 <el-col :span="1"></el-col>
                             </el-form-item>
@@ -229,16 +122,16 @@
                                 <el-col :span="22">
                                     <el-select
                                         style="width: 100%;font-size: 14px;"
-                                        v-model="userData.roleId" 
+                                        v-model="userData.state"
                                         placeholder="">
-                                        <template v-for="(item,index) in roleData" :key="index">
+                                        <template v-for="(item,index) in roleOption" :key="index">
                                             <el-option :label="item.label" :value="item.value" />
                                         </template>
                                     </el-select>
                                 </el-col>
                                 <el-col :span="1"></el-col>
                             </el-form-item>
-                            
+
                         </el-form>
                     </div>
                 </template>
@@ -262,96 +155,112 @@
 import { ref,computed } from "vue"
 import { useRouter,useRoute } from "vue-router"
 import { useMobileStore } from '@/stores/index'
-// import { getRoleList,getUserList,setUserEdit } from '@/api/user'
+import { getUserList,userDetail,userCreate,userEdit } from '@/api/user'
 import dialogView from "@/components/dialogView.vue"
-import choseGroup from "@/components/choseGroup.vue"
-
 const router = useRouter()
 const route = useRoute()
 const mobileStore = useMobileStore()
 const loadStatus = ref(false)
-const groupStatus = ref(false)
-const userData = ref({})
+const userData = ref({
+    "account": '',
+    "password": '',
+    "confirm_password": '',
+    "name": '',
+    "state": 0
+})
 const editStatus = ref(false)
 const userList = ref([])
 const totalCount = ref(0)
 const page = ref(1)
-let sortColumnKey = 'account'
-let colSizeObj = {}
-const roleData = ref([])
 const form = ref({
   name: '',
-  region: '',
-  date1: '',
-  date2: '',
-  delivery: false,
-  type: [],
-  resource: '',
   keyWord: '',
 })
+const roleOption = ref([
+    {
+        "label": "關閉",
+        "value": 0
+    },
+    {
+        "label": "廣告管理",
+        "value": 1
+    },
+    {
+        "label": "系統管理",
+        "value": 2
+    }
+])
+// 1新增 2編輯
+const mode = ref(1)
+
 const isMobile = computed(() => {
   return mobileStore.isMobile
 })
 
-const onSubmit = () => {
-    console.log('submit!')
+const createUser = () => {
+    console.log('createUser!')
+    mode.value = 1
+    resetData()
+    editStatus.value = true
     // getUserData()
 }
 
-const openSelect = () => {
-    groupStatus.value = true
-}
-
 const cancel = () => {
-    groupStatus.value = false
     editStatus.value = false
 }
 
 const editUser = (item) => {
-    userData.value = JSON.parse(JSON.stringify(item.row))
-    editStatus.value = true
+
+    mode.value = 2
+    resetData()
+    getUserDetail(item.row.id)
 }
+
+const getUserDetail = async(num) => {
+    if(loadStatus.value){
+        return false
+    }
+    loadStatus.value = true
+
+    const payload = {
+        "id":num
+    }
+    await userDetail(payload).then((res) => {
+        if(res.data.status){
+            userData.value = res.data.data
+            userData.value.id = num
+            userData.value.password = ''
+            userData.value.confirm_password = ''
+ 
+            // console.log('userData.value',userData.value)
+            // userList.value = res.data.data
+            // console.log('res',userList.value)
+            editStatus.value = true
+        }
+    }).finally(()=>{
+        loadStatus.value = false
+    })
+}
+
 
 const getUserData = async() => {
     if(loadStatus.value){
         return false
     }
-    
+
     loadStatus.value = true
-    const formData = new FormData();
-    // formData.append("draw", 99);
-    formData.append("length", 10);
-    formData.append("start", (page.value-1)*10);
-    formData.append("sortColumn",sortColumnKey);
-    if(!colSizeObj[sortColumnKey]){
-        formData.append("sortColumnDirection",'desc');
-    }else{
-        formData.append("sortColumnDirection",'asc');
-    }
-    // formData.append("sortColumn", '');
-    // formData.append("sortColumnDirection", '');
-    if(form.value.keyWord){
-        formData.append("searchValue",form.value.keyWord);
-    }
 
-    await getUserList(formData).then((res) => {
+    await getUserList().then((res) => {
         if(res.data.status){
+
             userList.value = res.data.data
-            totalCount.value = res.data.totalCount
+            console.log('getUserList',userList.value)
 
-        }else{
         }
-
+    }).finally(()=>{
         loadStatus.value = false
     })
-}
 
-const getRoleData = async() => {
-    await getRoleList().then((res) => {
-        if(res.data.status){
-            roleData.value = res.data.data.optionList
-        }
-    })
 }
 
 const changePage = (value) => {
@@ -360,31 +269,52 @@ const changePage = (value) => {
 }
 
 const saveEdit = async() => {
-    const formData = new FormData();
-    formData.append("id", userData.value.id);
-    formData.append("name", userData.value.name);
-    formData.append("nickName", userData.value.nickName);
-    formData.append("gender", userData.value.gender);
-    formData.append("phone", userData.value.phone);
-    formData.append("lineId", userData.value.lineId);
-    formData.append("email", userData.value.email);
-    formData.append("roleId", userData.value.roleId);
-    if(typeof userData.value.birthday == 'string'){
-        formData.append("birthday", userData.value.birthday);
-    }else{
-        formData.append("birthday", userData.value.birthday.toISOString());
+    // const formData = new FormData();
+    // console.log('saveEdit',mode.value)
+    if(mode.value == 1){
+        await getUserCreate()
+    }else if(mode.value == 2){
+        await getUserEdit()
     }
-
-    await setUserEdit(formData).then((res) => {
-        if(res.data.status){
-        }
-        
-    })
-
     await getUserData()
-    cancel()
-    userData.value = {}
+}
 
+const getUserCreate = async() => {
+    // console.log('getUserCreate',userData.value)
+    const payload = {
+        account: userData.value.account,
+        password:userData.value.password,
+        confirm_password: userData.value.confirm_password,
+        name: userData.value.name,
+        state: userData.value.state
+    }
+    // console.log('payload',payload)
+    await userCreate(payload).then((res) => {
+        // console.log('res',res)
+        if(res.data.status){
+            cancel()
+        }
+    })
+}
+
+const getUserEdit = async() => {
+    console.log('userData.value',userData.value)
+    const payload = {
+        id:userData.value.id,
+        name: userData.value.name,
+        state: userData.value.state,
+        // password:'',
+        // confirm_password:''
+    }
+    // console.log('getUserEdit',payload)
+    // console.log('getUserCreate',userData.value)
+    // console.log('payload',payload)
+    await userEdit(payload).then((res) => {
+        // console.log('res',res)
+        if(res.data.status){
+            cancel()
+        }
+    })
 }
 
 const tableRowClassName = (item) => {
@@ -394,25 +324,21 @@ const tableRowClassName = (item) => {
     return ''
 }
 
-const sortCol = (value) => {
-    if(sortColumnKey!=value){
-        sortColumnKey = value
-        getUserData()
-    }
+const transformRole = (num) => {
+    return roleOption.value.find((item)=>item.value == num).label
 }
 
-const sortSize = (value) => {
-    sortColumnKey = value
-    if(!colSizeObj[sortColumnKey]){
-        colSizeObj[sortColumnKey] = true
-    }else{
-        colSizeObj[sortColumnKey] = !colSizeObj[sortColumnKey]
+const resetData = () => {
+    userData.value = {
+        "account": '',
+        "password": '',
+        "confirm_password": '',
+        "name": '',
+        "state": 0
     }
-    getUserData()
 }
 
 const init = async() => {
-    getRoleData()
     await getUserData()
 }
 

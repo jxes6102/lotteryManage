@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [
     vue(),basicSsl()
   ],
-  base: "/bryteStage/",
+  base: "/lotteryManage/",
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

@@ -65,10 +65,10 @@ onMounted(() => {
 
   if(loginStore.status){
     loginInformation().then((res) => {
-      console.log('loginInformation',res)
+      // console.log('loginInformation',res)
       if(res.data.status){
         userStore.setUserInformation(res.data.data)
-        console.log('userStore',userStore.information)
+        // console.log('userStore',userStore.information)
       }
       
     })
