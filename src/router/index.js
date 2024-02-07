@@ -53,6 +53,8 @@ const router = createRouter({
 
 //可在未登入時進入
 const allow = ['loginView']
+//需權限進入
+const authorityList = ['userView']
 
 router.beforeEach((to, from) => {
   // console.log('to',to.name)
@@ -61,7 +63,11 @@ router.beforeEach((to, from) => {
   if(!(allow.includes(to.name) || loginStore?.status)){
     return '/loginView'
   }
+
   if(loginStore?.status){
+    if(authorityList.includes(to.name) && (userStore.information.state !== 2)){
+      return '/'
+    }
     // checkToken().then((res) => {
     //   // console.log('checkToken api',res)
     //   if(res.data.status){

@@ -25,85 +25,49 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref,computed,watch } from 'vue'
 import { useRouter } from "vue-router";
-import { useMenuStore,useMobileStore,useAnnounceStore,useLoginStore,useUserStore } from '@/stores/index'
+import { useMenuStore,useMobileStore,useLoginStore,useUserStore } from '@/stores/index'
 import { doLoginOut } from '@/api/login'
 import 'animate.css'
 
 const router = useRouter()
 const menuStore = useMenuStore()
 const mobileStore = useMobileStore()
-const announceStore = useAnnounceStore()
 const loginStore = useLoginStore()
 const userStore = useUserStore()
-
 const urlData = ref([
     // {
-    //     name:'系統管理',
-    //     children:[
-    //         {
-    //             name:'基本參數',
-    //             icon:'Document',
-    //             url:'/parameterView'
-    //         },
-    //         {
-    //             name:'權限管理',
-    //             icon:'Avatar',
-    //             url:'/permissionView'
-    //         },
-    //     ]
+    //     name:'家長管理',
+    //     icon:'Avatar',
+    //     url:'/parentView'
     // },
     // {
-    //     name:'訊息E點通',
-    //     children:[
-    //         {
-    //             name:'組織管理',
-    //             icon:'AddLocation',
-    //             url:'/organizeView'
-    //         },
-    //         {
-    //             name:'公告管理',
-    //             icon:'Service',
-    //             url:'/newsView'
-    //         },
-    //         {
-    //             name:'積分管理',
-    //             icon:'Coin',
-    //             url:'/pointView'
-    //         },
-    //         {
-    //             name:'推播通知',
-    //             icon:'Phone',
-    //             url:'/notificationView'
-    //         },
-    //         {
-    //             name:'使用者管理',
-    //             icon:'User',
-    //             url:'/userView'
-    //         },
-    //     ]
+    //     name:'日程管理',
+    //     icon:'Calendar',
+    //     url:'/scheduleView'
     // },
-    {
-        name:'使用者管理',
-        icon:'User',
-        url:'/userView'
-    },
-    {
-        name:'家長管理',
-        icon:'Avatar',
-        url:'/parentView'
-    },
-    {
-        name:'日程管理',
-        icon:'Calendar',
-        url:'/scheduleView'
-    },
     {
         name:'豋出',
         url:'/loginView'
     },
-]) 
+])
+const state = computed(() => {
+    return userStore.information.state
+})
+
+const checkUrl = () => {
+    if(state.value == 2){
+        urlData.value.unshift({
+            name:'使用者管理',
+            icon:'User',
+            url:'/userView'
+        },)
+    }
+}
+watch(state,(newValue, oldvalue) => {
+    checkUrl()
+},{ immediate: true })
 
 const toLink = async(url) => {
     if(url){
@@ -125,7 +89,6 @@ const toLink = async(url) => {
     }
     
 }
-
 
 </script>
 

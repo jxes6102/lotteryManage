@@ -26,14 +26,13 @@ import { onMounted,computed,watch } from 'vue'
 import { loginInformation } from '@/api/login'
 import headerView from './components/headerView.vue'
 import menuView from './components/menuView.vue'
-import { useMobileStore,useMenuStore,useheaderStore,useAnnounceStore,useLoginStore,useUserStore } from './stores/index'
+import { useMobileStore,useMenuStore,useheaderStore,useLoginStore,useUserStore } from './stores/index'
 import { useRouter } from "vue-router";
 
 const router = useRouter()
 const mobileStore = useMobileStore()
 const menuStore = useMenuStore()
 const headerStore = useheaderStore()
-const announceStore = useAnnounceStore()
 const loginStore = useLoginStore()
 const userStore = useUserStore()
 
@@ -83,11 +82,6 @@ onMounted(() => {
     setWidth()
   }, false);
 
-  if(localStorage.getItem('announce') == 'true'){
-    announceStore.openAnnounce()
-  }else{
-    announceStore.closeAnnounce()
-  }
 })
 
 watch(isMobile, (newVal,oldVal) => {

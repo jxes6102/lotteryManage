@@ -41,23 +41,6 @@ export const useheaderStore = defineStore('header', () => {
     return { status,setHeader,closeHeader,openHeader }
 })
 
-export const useAnnounceStore = defineStore('announce', () => {
-    const status = ref(false)
-    const setAnnounce = () => {
-        status.value = !status.value 
-        localStorage.getItem('announce',status.value)
-    }
-    const closeAnnounce = () => {
-        status.value = false
-        localStorage.setItem('announce',false)
-    }
-    const openAnnounce = () => {
-        status.value = true
-        localStorage.setItem('announce',true)
-    }
-    return { status,setAnnounce,closeAnnounce,openAnnounce }
-})
-
 export const useLoginStore = defineStore('login', () => {
     const status = ref(false)
     const setIsLogin = () => {

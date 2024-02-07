@@ -6,10 +6,6 @@
 
 <script setup>
 /*eslint-disable*/
-import { useAnnounceStore } from '@/stores/index'
-const announceStore = useAnnounceStore()
-localStorage.setItem('announce',false)
-announceStore.closeAnnounce()
 
 </script>
 
