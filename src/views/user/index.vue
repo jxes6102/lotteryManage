@@ -198,11 +198,9 @@ const isMobile = computed(() => {
 })
 
 const createUser = () => {
-    console.log('createUser!')
     mode.value = 1
     resetData()
     editStatus.value = true
-    // getUserData()
 }
 
 const cancel = () => {
@@ -232,9 +230,6 @@ const getUserDetail = async(num) => {
             userData.value.password = ''
             userData.value.confirm_password = ''
  
-            // console.log('userData.value',userData.value)
-            // userList.value = res.data.data
-            // console.log('res',userList.value)
             editStatus.value = true
         }
     }).finally(()=>{
@@ -252,10 +247,7 @@ const getUserData = async() => {
 
     await getUserList().then((res) => {
         if(res.data.status){
-
             userList.value = res.data.data
-            console.log('getUserList',userList.value)
-
         }
     }).finally(()=>{
         loadStatus.value = false
@@ -269,8 +261,6 @@ const changePage = (value) => {
 }
 
 const saveEdit = async() => {
-    // const formData = new FormData();
-    // console.log('saveEdit',mode.value)
     if(mode.value == 1){
         await getUserCreate()
     }else if(mode.value == 2){
@@ -280,7 +270,6 @@ const saveEdit = async() => {
 }
 
 const getUserCreate = async() => {
-    // console.log('getUserCreate',userData.value)
     const payload = {
         account: userData.value.account,
         password:userData.value.password,
@@ -288,9 +277,8 @@ const getUserCreate = async() => {
         name: userData.value.name,
         state: userData.value.state
     }
-    // console.log('payload',payload)
+
     await userCreate(payload).then((res) => {
-        // console.log('res',res)
         if(res.data.status){
             cancel()
         }
@@ -298,19 +286,15 @@ const getUserCreate = async() => {
 }
 
 const getUserEdit = async() => {
-    console.log('userData.value',userData.value)
     const payload = {
         id:userData.value.id,
         name: userData.value.name,
         state: userData.value.state,
-        // password:'',
-        // confirm_password:''
+        password:userData.value.password,
+        confirm_password:userData.value.confirm_password
     }
-    // console.log('getUserEdit',payload)
-    // console.log('getUserCreate',userData.value)
-    // console.log('payload',payload)
+
     await userEdit(payload).then((res) => {
-        // console.log('res',res)
         if(res.data.status){
             cancel()
         }

@@ -179,7 +179,6 @@ const login = async() => {
 //   formData.append("captchaCode", form.value?.checkNum);
 
   await doLogin(payLoad).then((res) => {
-      console.log('doLogin',res)
       if(res.data.status){
           loginStore.setToken(res.data.data.access_token)
           resetForm()
