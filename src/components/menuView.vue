@@ -48,6 +48,11 @@ const urlData = ref([
     //     url:'/scheduleView'
     // },
     {
+        name:'廣告管理',
+        icon:'DocumentCopy',
+        url:'/advertiseView'
+    },
+    {
         name:'豋出',
         url:'/loginView'
     },

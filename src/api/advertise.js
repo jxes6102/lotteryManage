@@ -1,3 +1,4 @@
+import request from '@/api/index'
 export const getAdvertise = () => {
     const url = '/api/advertising/front'
     const method = 'get'
@@ -16,29 +17,32 @@ export const advertiseList = () => {
     })
 }
 
-export const advertiseDetail = () => {
+export const advertiseDetail = (data) => {
     const url = '/api/advertising/detail'
     const method = 'get'
     return request({
       method,
       url,
+      data
     })
 }
 
-export const advertiseCreate = () => {
+export const advertiseCreate = (data) => {
     const url = '/api/advertising/create'
     const method = 'post'
     return request({
       method,
       url,
+      data
     })
 }
 
-export const advertiseEdit = () => {
+export const advertiseEdit = (data) => {
     const url = '/api/advertising/edit'
     const method = 'post'
     return request({
       method,
       url,
+      data
     })
 }
