@@ -15,7 +15,7 @@
                 </el-form-item>
                 <el-form-item>
                     <el-col :span="24">
-                        <el-button class="mx-1" type="primary" @click="createUser">上傳圖片</el-button>
+                        <el-button class="mx-1" type="primary" @click="openUpload">上傳圖片</el-button>
                     </el-col>
                 </el-form-item>
             </el-form>
@@ -151,6 +151,35 @@
                     </div>
                 </template>
             </dialogView>
+            <dialogView type="auto" @close="closeUpload" v-if="uploadStatus">
+                <template v-slot:title>
+                    <div class="w-full my-[1px] md:my-1 px-2 py-[1px] md:py-1 text-2xl">
+                        上傳檔案
+                    </div>
+                    <div class="line-style w-[100%] text-[#D3D3D3] flex"></div>
+                </template>
+                <template v-slot:message>
+                    <div class="w-[100%] h-auto flex flex-wrap justify-center items-center overflow-x-hidden overflow-y-auto">
+                        <el-upload
+                            class="upload-demo"
+                            drag
+                            :show-file-list="false"
+                            :auto-upload="false"
+                            :on-change="test"
+                        >
+                            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                            <div class="el-upload__text">
+                                Drop file here or <em>click to upload</em>
+                            </div>
+                            <!-- <template #tip>
+                                <div class="el-upload__tip">
+                                    jpg/png files with a size less than 500kb
+                                </div>
+                            </template> -->
+                        </el-upload>
+                    </div>
+                </template>
+            </dialogView>
         </Teleport>
     </div>
 </template>
@@ -176,6 +205,7 @@ const userData = ref({
     "state": 0
 })
 const editStatus = ref(false)
+const uploadStatus = ref(false)
 const userList = ref([])
 const totalCount = ref(0)
 const page = ref(1)
@@ -327,6 +357,18 @@ const resetData = () => {
         "name": '',
         "state": 0
     }
+}
+
+const openUpload = () => {
+    uploadStatus.value = true
+}
+
+const closeUpload = () => {
+    uploadStatus.value = false
+}
+
+const test = (event) => {
+    console.log('event',event)
 }
 
 const init = async() => {
