@@ -82,7 +82,15 @@ onMounted(() => {
     setWidth()
   }, false);
 
+  // window.addEventListener("beforeunload", (e) => {
+  //   localStorage.setItem('test','test')
+  // });
+
 })
+
+
+
+
 
 watch(isMobile, (newVal,oldVal) => {
   if((newVal == true) && (oldVal == false)){

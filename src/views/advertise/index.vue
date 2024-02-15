@@ -10,12 +10,7 @@
             <el-form :inline="true" :model="form" label-width="80px">
                 <el-form-item>
                     <el-col :span="24">
-                        <el-button class="mx-1" type="primary" @click="createUser">新增廣告</el-button>
-                    </el-col>
-                </el-form-item>
-                <el-form-item>
-                    <el-col :span="24">
-                        <el-button class="mx-1" type="primary" @click="openUpload">上傳圖片</el-button>
+                        <el-button class="mx-1" type="primary" @click="createFile">新增廣告</el-button>
                     </el-col>
                 </el-form-item>
             </el-form>
@@ -24,25 +19,12 @@
         <div class="w-full md:w-[75%] lg:w-[80%] h-auto my-1 px-2 py-1 flex flex-wrap justify-center items-center">
             <el-table
                 :row-class-name="tableRowClassName"
-                :data="userList"
+                :data="fileList"
                 style="width: 100%;font-size:16px;">
-                <el-table-column prop="account" >
+                <el-table-column prop="name" :width="isMobile ? 90 : 200">
                     <template #header>
                         <div class="flex flex-wrap">
-                            <div class="cursor-pointer">帳號</div>
-                            <!-- <el-icon class="ml-[1px] md:ml-1 cursor-pointer" @click="sortSize(scope.column.property)" :size="20">
-                                <Sort />
-                            </el-icon> -->
-                        </div>
-                    </template>
-                    <template #default="scope">
-                        <div class="truncate">{{ scope.row.account }}</div>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="name" >
-                    <template #header>
-                        <div class="flex flex-wrap">
-                            <div class="cursor-pointer">姓名</div>
+                            <div class="cursor-pointer">廣告名稱</div>
                             <!-- <el-icon class="ml-[1px] md:ml-1 cursor-pointer" @click="sortSize(scope.column.property)" :size="20">
                                 <Sort />
                             </el-icon> -->
@@ -52,84 +34,87 @@
                         <div class="truncate">{{ scope.row.name }}</div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="state" label="身分" >
+                <el-table-column prop="state" label="廣告狀態" :width="isMobile ? 90 : 200">
                     <template #default="scope">
-                        <div class="truncate">{{ transformRole(scope.row.state) }}</div>
+                        <div class="truncate">{{ transformType(scope.row.state) }}</div>
                     </template>
                 </el-table-column>
-                <el-table-column width="90" label="操作" >
+                <el-table-column>
+                    <template #header>
+                        <div class="w-full flex flex-wrap justify-center items-center">
+                            <div class="cursor-pointer">操作</div>
+                        </div>
+                    </template>
                     <template #default="scope">
-                        <div class="truncate">
-                            <el-button class="mx-1" type="primary" @click="editUser(scope)">編輯</el-button>
+                        <div class="w-full flex flex-wrap justify-end items-center">
+                            <div class="truncate">
+                                <el-button class="mx-1" type="primary" @click="editFile(scope)">編輯</el-button>
+                            </div>
+                            <div class="truncate">
+                                <el-button class="mx-1" type="primary">刪除</el-button>
+                            </div>
                         </div>
                     </template>
                 </el-table-column>
             </el-table>
-        </div>
-        <div class="w-full md:w-[80%] h-auto flex flex-wrap justify-center items-center">
-            <el-pagination
-                :small="isMobile"
-                :background="!isMobile"
-                layout="prev, pager, next"
-                :current-page="page"
-                :total="totalCount"
-                :page-sizes="[10]"
-                :disabled="loadStatus"
-                @current-change="changePage"
-                class="mt-4"
-            />
         </div>
         <div class="w-full my-3 px-3 text-xl flex flex-wrap justify-start items-center">
             {{ '共' + totalCount + '筆資料' }}
         </div>
 
         <Teleport to="body">
-            <dialogView type="auto" @close="cancel" v-if="editStatus">
+            <dialogView type="auto" @close="closeUpload" v-if="uploadStatus">
                 <template v-slot:title>
                     <div class="w-full my-[1px] md:my-1 px-2 py-[1px] md:py-1 text-2xl">
-                        {{ mode == 1 ? '新增使用者' : '編輯使用者' }}
+                        新增廣告
                     </div>
                     <div class="line-style w-[100%] text-[#D3D3D3] flex"></div>
                 </template>
                 <template v-slot:message>
                     <div class="w-[100%] h-auto flex flex-wrap justify-center items-center overflow-x-hidden overflow-y-auto">
-                        <el-form :inline="false" label-position="top" :model="userData" label-width="60px" style="width:100%;padding:10px 5px;">
-                            <el-form-item label="姓名">
+                        <!-- <el-upload
+                            class="upload-demo"
+                            drag
+                            :show-file-list="false"
+                            :auto-upload="false"
+                            :on-change="upFile"
+                        >
+                            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                            <div class="el-upload__text">
+                                Drop file here or <em>click to upload</em>
+                            </div>
+                        </el-upload> -->
+                        <el-form :inline="false" label-position="top" :model="fileData" label-width="60px" style="width:100%;padding:10px 5px;">
+                            <el-form-item label="廣告名稱">
                                 <el-col :span="1"></el-col>
                                 <el-col :span="22">
-                                    <el-input placeholder="" v-model="userData.name" />
+                                    <el-input placeholder="" v-model="fileData.name" />
                                 </el-col>
                                 <el-col :span="1"></el-col>
                             </el-form-item>
-                            <el-form-item v-if="mode==1" label="帳號">
+                            <el-form-item label="上傳檔案">
                                 <el-col :span="1"></el-col>
                                 <el-col :span="22">
-                                    <el-input placeholder="" v-model="userData.account" />
+                                    <div class="w-full flex flex-col justify-center items-center">
+                                        <input class="fileStyle w-full" @change="upFile" type="file" placeholder="" />
+                                        <div>{{fileMessage}}</div>
+                                        <el-input class="mt-1" placeholder="" v-model="fileData.pic" >
+                                            <template v-slot:prepend>
+                                                <div>檔案位置</div>
+                                            </template>
+                                        </el-input>
+                                    </div>
                                 </el-col>
                                 <el-col :span="1"></el-col>
                             </el-form-item>
-                            <el-form-item label="密碼">
-                                <el-col :span="1"></el-col>
-                                <el-col :span="22">
-                                    <el-input placeholder="" v-model="userData.password" />
-                                </el-col>
-                                <el-col :span="1"></el-col>
-                            </el-form-item>
-                            <el-form-item label="確認密碼">
-                                <el-col :span="1"></el-col>
-                                <el-col :span="22">
-                                    <el-input placeholder="" v-model="userData.confirm_password" />
-                                </el-col>
-                                <el-col :span="1"></el-col>
-                            </el-form-item>
-                            <el-form-item label="身分">
+                            <el-form-item label="廣告狀態">
                                 <el-col :span="1"></el-col>
                                 <el-col :span="22">
                                     <el-select
                                         style="width: 100%;font-size: 14px;"
-                                        v-model="userData.state"
+                                        v-model="fileData.state"
                                         placeholder="">
-                                        <template v-for="(item,index) in roleOption" :key="index">
+                                        <template v-for="(item,index) in fileOption" :key="index">
                                             <el-option :label="item.label" :value="item.value" />
                                         </template>
                                     </el-select>
@@ -144,39 +129,10 @@
                     <div class="line-style w-[100%] text-[#D3D3D3] flex"></div>
                     <div class="w-full h-auto my-1 px-2 py-1 flex flex-wrap justify-end items-center">
                         <button
-                            @click="saveEdit"
+                            @click="addFile"
                             class="w-auto bg-blue-500 hover:bg-blue-600 text-white font-bold mx-2 py-1 px-2 md:py-2 md:px-3 rounded">
-                            修改
+                            新增
                         </button>
-                    </div>
-                </template>
-            </dialogView>
-            <dialogView type="auto" @close="closeUpload" v-if="uploadStatus">
-                <template v-slot:title>
-                    <div class="w-full my-[1px] md:my-1 px-2 py-[1px] md:py-1 text-2xl">
-                        上傳檔案
-                    </div>
-                    <div class="line-style w-[100%] text-[#D3D3D3] flex"></div>
-                </template>
-                <template v-slot:message>
-                    <div class="w-[100%] h-auto flex flex-wrap justify-center items-center overflow-x-hidden overflow-y-auto">
-                        <el-upload
-                            class="upload-demo"
-                            drag
-                            :show-file-list="false"
-                            :auto-upload="false"
-                            :on-change="test"
-                        >
-                            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-                            <div class="el-upload__text">
-                                Drop file here or <em>click to upload</em>
-                            </div>
-                            <!-- <template #tip>
-                                <div class="el-upload__tip">
-                                    jpg/png files with a size less than 500kb
-                                </div>
-                            </template> -->
-                        </el-upload>
                     </div>
                 </template>
             </dialogView>
@@ -197,36 +153,13 @@ const router = useRouter()
 const route = useRoute()
 const mobileStore = useMobileStore()
 const loadStatus = ref(false)
-const userData = ref({
-    "account": '',
-    "password": '',
-    "confirm_password": '',
-    "name": '',
-    "state": 0
-})
-const editStatus = ref(false)
 const uploadStatus = ref(false)
-const userList = ref([])
+const fileList = ref([])
 const totalCount = ref(0)
-const page = ref(1)
 const form = ref({
   name: '',
   keyWord: '',
 })
-const roleOption = ref([
-    {
-        "label": "關閉",
-        "value": 0
-    },
-    {
-        "label": "廣告管理",
-        "value": 1
-    },
-    {
-        "label": "系統管理",
-        "value": 2
-    }
-])
 // 1新增 2編輯
 const mode = ref(1)
 
@@ -234,17 +167,13 @@ const isMobile = computed(() => {
   return mobileStore.isMobile
 })
 
-const createUser = () => {
+const createFile = () => {
     mode.value = 1
     resetData()
-    editStatus.value = true
+    openUpload()
 }
 
-const cancel = () => {
-    editStatus.value = false
-}
-
-const editUser = (item) => {
+const editFile = (item) => {
 
     mode.value = 2
     resetData()
@@ -252,90 +181,50 @@ const editUser = (item) => {
 }
 
 const getUserDetail = async(num) => {
-    // if(loadStatus.value){
-    //     return false
-    // }
-    // loadStatus.value = true
-
-    // const payload = {
-    //     "id":num
-    // }
-    // await userDetail(payload).then((res) => {
-    //     if(res.data.status){
-    //         userData.value = res.data.data
-    //         userData.value.id = num
-    //         userData.value.password = ''
-    //         userData.value.confirm_password = ''
- 
-    //         editStatus.value = true
-    //     }
-    // }).finally(()=>{
-    //     loadStatus.value = false
-    // })
-}
-
-
-const getUserData = async() => {
-    // if(loadStatus.value){
-    //     return false
-    // }
-
-    // loadStatus.value = true
-
-    // await getUserList().then((res) => {
-    //     if(res.data.status){
-    //         userList.value = res.data.data
-    //     }
-    // }).finally(()=>{
-    //     loadStatus.value = false
-    // })
-
-}
-
-const changePage = (value) => {
-    page.value = value
-    getUserData()
-}
-
-const saveEdit = async() => {
-    if(mode.value == 1){
-        await getUserCreate()
-    }else if(mode.value == 2){
-        await getUserEdit()
+    if(loadStatus.value){
+        return false
     }
-    await getUserData()
+    loadStatus.value = true
+
+    const payload = {
+        "id":num
+    }
+    await advertiseDetail(payload).then((res) => {
+        // console.log('res',res)
+        if(res.data.status){
+            fileData.value = {
+                "id": res.data.data.id,
+                "name": res.data.data.name,
+                "pic": res.data.data.pic,
+                "url": res.data.data.url,
+                "state": res.data.data.state
+            }
+            // console.log('fileData.value',fileData.value)
+            openUpload()
+        }
+    }).finally(()=>{
+        loadStatus.value = false
+    })
 }
 
-const getUserCreate = async() => {
-    // const payload = {
-    //     account: userData.value.account,
-    //     password:userData.value.password,
-    //     confirm_password: userData.value.confirm_password,
-    //     name: userData.value.name,
-    //     state: userData.value.state
-    // }
 
-    // await userCreate(payload).then((res) => {
-    //     if(res.data.status){
-    //         cancel()
-    //     }
-    // })
-}
+const getFileData = async() => {
+    if(loadStatus.value){
+        return false
+    }
 
-const getUserEdit = async() => {
-    // const payload = {
-    //     id:userData.value.id,
-    //     name: userData.value.name,
-    //     state: userData.value.state,
-    //     password:userData.value.password,
-    //     confirm_password:userData.value.confirm_password
-    // }
+    loadStatus.value = true
 
-    // await userEdit(payload).then((res) => {
-    //     if(res.data.status){
-    //         cancel()
-    //     }
-    // })
+    await advertiseList().then((res) => {
+        // console.log('res',res)
+        if(res.data.status){
+            fileList.value = res.data.data
+            totalCount.value = fileList.value.length
+        }
+    }).finally(()=>{
+        loadStatus.value = false
+    })
+
 }
 
 const tableRowClassName = (item) => {
@@ -345,16 +234,15 @@ const tableRowClassName = (item) => {
     return ''
 }
 
-const transformRole = (num) => {
-    return roleOption.value.find((item)=>item.value == num).label
+const transformType = (num) => {
+    return fileOption.value.find((item)=>item.value == num).label
 }
 
 const resetData = () => {
-    userData.value = {
-        "account": '',
-        "password": '',
-        "confirm_password": '',
+    fileData.value = {
         "name": '',
+        "pic": '',
+        "url": '',
         "state": 0
     }
 }
@@ -367,12 +255,95 @@ const closeUpload = () => {
     uploadStatus.value = false
 }
 
-const test = (event) => {
-    console.log('event',event)
+const fileData = ref({
+    "name": '',
+    "pic": '',
+    "url": '',
+    "state": 0
+})
+const fileOption = ref([
+    {
+        "label": "關閉",
+        "value": 0
+    },
+    {
+        "label": "上",
+        "value": 1
+    },
+    {
+        "label": "中",
+        "value": 2
+    },
+    {
+        "label": "下",
+        "value": 3
+    }
+])
+
+const fileMessage = ref('請上傳檔案')
+const upFile = async(event) => {
+    // console.log('event',event.target.files[0])
+    fileMessage.value = '上傳中'
+    const fileType = event.target.files[0].type.split('/')[1]
+    if(!['jpg','png'].includes(fileType)){
+        // console.log('error')
+        fileMessage.value = "檔案類型錯誤"
+        return false
+    }
+    // console.log("file", event.target.files[0])
+    
+    const formData = new FormData();
+    formData.append("tag", "advertising");
+    formData.append("file", event.target.files[0]);
+    await uploadFile(formData).then((res) => {
+        // console.log('res',res)
+        if(res.data.status){
+            fileMessage.value = res.data.message
+            // console.log('url',res.data.data.url)
+            // console.log('file_name',res.data.data.file_name)
+            // fileData.value.name = res.data.data.file_name
+            fileData.value.pic = res.data.data.url
+            fileData.value.url = res.data.data.url
+            
+            // closeUpload()
+        }else{
+            fileMessage.value = res.data.message
+        }
+    })
+
+}
+
+const addFile = async() => {
+    if(mode.value == 1){
+        // console.log('add File',fileData.value)
+        await advertiseCreate(fileData.value).then((res) => {
+            // console.log('res',res)
+            // if(res.data.status){
+            //     fileMessage.value = res.data.message
+            //     // console.log('url',res.data.data.url)
+            //     // console.log('file_name',res.data.data.file_name)
+            //     fileData.value.name = res.data.data.file_name
+            //     fileData.value.pic = res.data.data.url
+            //     fileData.value.url = res.data.data.url
+            
+            //     // closeUpload()
+            // }else{
+            //     fileMessage.value = res.data.message
+            // }
+        })
+    }else if(mode.value == 2){
+        // console.log('edit File',fileData.value)
+        await advertiseEdit(fileData.value).then((res) => {
+            // console.log('res',res)
+        })
+    }
+
+    getFileData()
+    closeUpload()
 }
 
 const init = async() => {
-    await getUserData()
+    await getFileData()
 }
 
 init()
@@ -413,4 +384,13 @@ init()
     }
 }
 
+:deep(.fileStyle .el-input__wrapper) {
+    padding: 0px;
+}
+
+:deep(input::file-selector-button) {
+    height: 100%;
+    padding: 0;
+}
+  
 </style>
