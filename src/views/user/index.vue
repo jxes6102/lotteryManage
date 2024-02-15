@@ -61,7 +61,7 @@
                 </el-table-column>
             </el-table>
         </div>
-        <div class="w-full md:w-[80%] h-auto flex flex-wrap justify-center items-center">
+        <!-- <div class="w-full md:w-[80%] h-auto flex flex-wrap justify-center items-center">
             <el-pagination
                 :small="isMobile"
                 :background="!isMobile"
@@ -73,7 +73,7 @@
                 @current-change="changePage"
                 class="mt-4"
             />
-        </div>
+        </div> -->
         <div class="w-full my-3 px-3 text-xl flex flex-wrap justify-start items-center">
             {{ '共' + totalCount + '筆資料' }}
         </div>
@@ -88,29 +88,29 @@
                 </template>
                 <template v-slot:message>
                     <div class="w-[100%] h-auto flex flex-wrap justify-center items-center overflow-x-hidden overflow-y-auto">
-                        <el-form :inline="false" label-position="top" :model="userData" label-width="60px" style="width:100%;padding:10px 5px;">
-                            <el-form-item label="姓名">
+                        <el-form ref="formItem" :rules="rules" :inline="false" label-position="top" :model="userData" label-width="60px" style="width:100%;padding:10px 5px;">
+                            <el-form-item prop="name" label="姓名">
                                 <el-col :span="1"></el-col>
                                 <el-col :span="22">
                                     <el-input placeholder="" v-model="userData.name" />
                                 </el-col>
                                 <el-col :span="1"></el-col>
                             </el-form-item>
-                            <el-form-item v-if="mode==1" label="帳號">
+                            <el-form-item prop="account" v-if="mode==1" label="帳號">
                                 <el-col :span="1"></el-col>
                                 <el-col :span="22">
                                     <el-input placeholder="" v-model="userData.account" />
                                 </el-col>
                                 <el-col :span="1"></el-col>
                             </el-form-item>
-                            <el-form-item label="密碼">
+                            <el-form-item prop="password" label="密碼">
                                 <el-col :span="1"></el-col>
                                 <el-col :span="22">
                                     <el-input placeholder="" v-model="userData.password" />
                                 </el-col>
                                 <el-col :span="1"></el-col>
                             </el-form-item>
-                            <el-form-item label="確認密碼">
+                            <el-form-item prop="confirm_password" label="確認密碼">
                                 <el-col :span="1"></el-col>
                                 <el-col :span="22">
                                     <el-input placeholder="" v-model="userData.confirm_password" />
@@ -141,7 +141,7 @@
                         <button
                             @click="saveEdit"
                             class="w-auto bg-blue-500 hover:bg-blue-600 text-white font-bold mx-2 py-1 px-2 md:py-2 md:px-3 rounded">
-                            修改
+                            {{ mode == 1 ? '新增' : '修改' }}
                         </button>
                     </div>
                 </template>
@@ -160,6 +160,7 @@ import dialogView from "@/components/dialogView.vue"
 const router = useRouter()
 const route = useRoute()
 const mobileStore = useMobileStore()
+const formItem = ref(null)
 const loadStatus = ref(false)
 const userData = ref({
     "account": '',
@@ -190,6 +191,34 @@ const roleOption = ref([
         "value": 2
     }
 ])
+
+const checkConfirmPassword = (rule, value, callback) => {
+  if (value != userData.value.password) {
+    callback(new Error('密碼不同'))
+  }else {
+    callback()
+  }
+}
+
+const rules = ref({
+    name: [
+        { required: true, message: '請輸入名稱', trigger: 'blur' },
+    ],
+    account: [
+        { required: true, message: '請輸入帳號', trigger: 'blur' },
+        { min: 3, max: 15, message: 'Length should be 3 to 15', trigger: 'change' },
+    ],
+    password: [
+        { required: true, message: '請輸入密碼', trigger: 'blur' },
+        { min: 3, max: 15, message: 'Length should be 3 to 15', trigger: 'change' },
+    ],
+    confirm_password: [
+        { required: true, message: '請輸入密碼', trigger: 'blur' },
+        { min: 3, max: 15, message: 'Length should be 3 to 15', trigger: 'change' },
+        { validator: checkConfirmPassword, trigger: 'change' }
+    ],
+})
+
 // 1新增 2編輯
 const mode = ref(1)
 
@@ -229,7 +258,7 @@ const getUserDetail = async(num) => {
             userData.value.id = num
             userData.value.password = ''
             userData.value.confirm_password = ''
- 
+
             editStatus.value = true
         }
     }).finally(()=>{
@@ -248,6 +277,7 @@ const getUserData = async() => {
     await getUserList().then((res) => {
         if(res.data.status){
             userList.value = res.data.data
+            totalCount.value = userList.value.length
         }
     }).finally(()=>{
         loadStatus.value = false
@@ -255,18 +285,27 @@ const getUserData = async() => {
 
 }
 
-const changePage = (value) => {
-    page.value = value
-    getUserData()
-}
+// const changePage = (value) => {
+//     page.value = value
+//     getUserData()
+// }
 
 const saveEdit = async() => {
-    if(mode.value == 1){
-        await getUserCreate()
-    }else if(mode.value == 2){
-        await getUserEdit()
-    }
-    await getUserData()
+    await formItem.value.validate(async(valid, fields) => {
+
+        if (valid) {
+            if(mode.value == 1){
+                await getUserCreate()
+            }else if(mode.value == 2){
+                await getUserEdit()
+            }
+            await getUserData()
+            formItem.value.resetFields()
+        } else {
+            return false
+        }
+    })
+    
 }
 
 const getUserCreate = async() => {
@@ -357,10 +396,18 @@ init()
     padding: 0px 10px !important;
 }
 
+:deep(.el-form-item__error){
+    padding: 1px 10px !important;
+}
+
 @media screen and (min-width: 768px) {
     :deep(.el-form-item__label){
         margin: 0px 0px 0px 0px !important;
         padding: 0px 15px !important;
+    }
+    
+    :deep(.el-form-item__error){
+        padding: 1px 15px !important;
     }
 }
 

@@ -21,7 +21,7 @@
                 :row-class-name="tableRowClassName"
                 :data="fileList"
                 style="width: 100%;font-size:16px;">
-                <el-table-column prop="name" :width="isMobile ? 90 : 200">
+                <el-table-column prop="name" :width="isMobile ? 90 : ''">
                     <template #header>
                         <div class="flex flex-wrap">
                             <div class="cursor-pointer">廣告名稱</div>
@@ -34,7 +34,7 @@
                         <div class="truncate">{{ scope.row.name }}</div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="state" label="廣告狀態" :width="isMobile ? 90 : 200">
+                <el-table-column prop="state" label="廣告狀態" :width="isMobile ? 90 : ''">
                     <template #default="scope">
                         <div class="truncate">{{ transformType(scope.row.state) }}</div>
                     </template>
@@ -46,13 +46,13 @@
                         </div>
                     </template>
                     <template #default="scope">
-                        <div class="w-full flex flex-wrap justify-end items-center">
+                        <div class="w-full flex flex-wrap justify-center items-center">
                             <div class="truncate">
-                                <el-button class="mx-1" type="primary" @click="editFile(scope)">編輯</el-button>
+                                <el-button class="mx-[1px] md:mx-1" type="primary" @click="editFile(scope)">編輯</el-button>
                             </div>
-                            <div class="truncate">
+                            <!-- <div class="truncate">
                                 <el-button class="mx-1" type="primary">刪除</el-button>
-                            </div>
+                            </div> -->
                         </div>
                     </template>
                 </el-table-column>
@@ -66,7 +66,7 @@
             <dialogView type="auto" @close="closeUpload" v-if="uploadStatus">
                 <template v-slot:title>
                     <div class="w-full my-[1px] md:my-1 px-2 py-[1px] md:py-1 text-2xl">
-                        新增廣告
+                        {{ mode == 1 ? '新增廣告' : '修改廣告' }}
                     </div>
                     <div class="line-style w-[100%] text-[#D3D3D3] flex"></div>
                 </template>
@@ -84,20 +84,24 @@
                                 Drop file here or <em>click to upload</em>
                             </div>
                         </el-upload> -->
-                        <el-form :inline="false" label-position="top" :model="fileData" label-width="60px" style="width:100%;padding:10px 5px;">
-                            <el-form-item label="廣告名稱">
+                        <el-form ref="formItem" :rules="rules" :inline="false" label-position="top" :model="fileData" label-width="60px" style="width:100%;padding:10px 5px;">
+                            <el-form-item prop="name" label="廣告名稱">
                                 <el-col :span="1"></el-col>
                                 <el-col :span="22">
                                     <el-input placeholder="" v-model="fileData.name" />
                                 </el-col>
                                 <el-col :span="1"></el-col>
                             </el-form-item>
-                            <el-form-item label="上傳檔案">
+                            <el-form-item prop="pic" label="上傳檔案">
                                 <el-col :span="1"></el-col>
                                 <el-col :span="22">
                                     <div class="w-full flex flex-col justify-center items-center">
                                         <input class="fileStyle w-full" @change="upFile" type="file" placeholder="" />
-                                        <div>{{fileMessage}}</div>
+                                        <div class="w-full my-[2px] md:my-1 flex flex-col justify-center items-center">
+                                            <div>{{fileMessage}}</div>
+                                            <img v-if="fileData?.pic" :src="fileData?.pic" alt="">
+                                        </div>
+                                        
                                         <el-input class="mt-1" placeholder="" v-model="fileData.pic" >
                                             <template v-slot:prepend>
                                                 <div>檔案位置</div>
@@ -107,6 +111,13 @@
                                 </el-col>
                                 <el-col :span="1"></el-col>
                             </el-form-item>
+                            <!-- <el-form-item label="超連結位置">
+                                <el-col :span="1"></el-col>
+                                <el-col :span="22">
+                                    <el-input placeholder="" v-model="fileData.url" />
+                                </el-col>
+                                <el-col :span="1"></el-col>
+                            </el-form-item> -->
                             <el-form-item label="廣告狀態">
                                 <el-col :span="1"></el-col>
                                 <el-col :span="22">
@@ -131,7 +142,7 @@
                         <button
                             @click="addFile"
                             class="w-auto bg-blue-500 hover:bg-blue-600 text-white font-bold mx-2 py-1 px-2 md:py-2 md:px-3 rounded">
-                            新增
+                            {{ mode == 1 ? '新增' : '修改' }}
                         </button>
                     </div>
                 </template>
@@ -145,7 +156,6 @@
 import { ref,computed } from "vue"
 import { useRouter,useRoute } from "vue-router"
 import { useMobileStore } from '@/stores/index'
-// import { getUserList,userDetail,userCreate,userEdit } from '@/api/user'
 import { advertiseList,advertiseDetail,advertiseCreate,advertiseEdit } from '@/api/advertise'
 import { uploadFile } from '@/api/file'
 import dialogView from "@/components/dialogView.vue"
@@ -156,6 +166,16 @@ const loadStatus = ref(false)
 const uploadStatus = ref(false)
 const fileList = ref([])
 const totalCount = ref(0)
+const uploading = ref(false)
+const formItem = ref(null)
+const rules = ref({
+    name: [
+        { required: true, message: '請輸入名稱', trigger: 'blur' },
+    ],
+    pic: [
+        { required: true, message: '請上傳檔案', trigger: 'blur' },
+    ]
+})
 const form = ref({
   name: '',
   keyWord: '',
@@ -220,6 +240,7 @@ const getFileData = async() => {
         if(res.data.status){
             fileList.value = res.data.data
             totalCount.value = fileList.value.length
+            // console.log('fileList',fileList.value)
         }
     }).finally(()=>{
         loadStatus.value = false
@@ -282,12 +303,14 @@ const fileOption = ref([
 
 const fileMessage = ref('請上傳檔案')
 const upFile = async(event) => {
+    uploading.value = true
     // console.log('event',event.target.files[0])
     fileMessage.value = '上傳中'
     const fileType = event.target.files[0].type.split('/')[1]
     if(!['jpg','png'].includes(fileType)){
         // console.log('error')
         fileMessage.value = "檔案類型錯誤"
+        uploading.value = false
         return false
     }
     // console.log("file", event.target.files[0])
@@ -297,49 +320,59 @@ const upFile = async(event) => {
     formData.append("file", event.target.files[0]);
     await uploadFile(formData).then((res) => {
         // console.log('res',res)
+        fileMessage.value = res.data.message
         if(res.data.status){
-            fileMessage.value = res.data.message
             // console.log('url',res.data.data.url)
             // console.log('file_name',res.data.data.file_name)
-            // fileData.value.name = res.data.data.file_name
             fileData.value.pic = res.data.data.url
-            fileData.value.url = res.data.data.url
+            // fileData.value.url = res.data.data.url
             
             // closeUpload()
-        }else{
-            fileMessage.value = res.data.message
         }
+        uploading.value = false
     })
 
 }
 
 const addFile = async() => {
-    if(mode.value == 1){
-        // console.log('add File',fileData.value)
-        await advertiseCreate(fileData.value).then((res) => {
-            // console.log('res',res)
-            // if(res.data.status){
-            //     fileMessage.value = res.data.message
-            //     // console.log('url',res.data.data.url)
-            //     // console.log('file_name',res.data.data.file_name)
-            //     fileData.value.name = res.data.data.file_name
-            //     fileData.value.pic = res.data.data.url
-            //     fileData.value.url = res.data.data.url
-            
-            //     // closeUpload()
-            // }else{
-            //     fileMessage.value = res.data.message
-            // }
-        })
-    }else if(mode.value == 2){
-        // console.log('edit File',fileData.value)
-        await advertiseEdit(fileData.value).then((res) => {
-            // console.log('res',res)
-        })
+    if(uploading.value){
+       return false 
     }
 
-    getFileData()
-    closeUpload()
+    await formItem.value.validate(async(valid, fields) => {
+
+        if (valid) {
+            if(mode.value == 1){
+                // console.log('add File',fileData.value)
+                await advertiseCreate(fileData.value).then((res) => {
+                    // console.log('res',res)
+                    fileMessage.value = res.data.message
+                    if(res.data.status){
+                        getFileData()
+                        closeUpload()
+                        fileMessage.value = '請上傳檔案'
+                    }
+                })
+            }else if(mode.value == 2){
+                // console.log('edit File',fileData.value)
+                await advertiseEdit(fileData.value).then((res) => {
+                    // console.log('res',res)
+                    fileMessage.value = res.data.message
+                    if(res.data.status){
+                        getFileData()
+                        closeUpload()
+                        fileMessage.value = '請上傳檔案'
+                    }
+                        
+                })
+            }
+
+            formItem.value.resetFields()
+        } else {
+            return false
+        }
+    })
+
 }
 
 const init = async() => {
@@ -377,10 +410,18 @@ init()
     padding: 0px 10px !important;
 }
 
+:deep(.el-form-item__error){
+    padding: 1px 10px !important;
+}
+
 @media screen and (min-width: 768px) {
     :deep(.el-form-item__label){
         margin: 0px 0px 0px 0px !important;
         padding: 0px 15px !important;
+    }
+
+    :deep(.el-form-item__error){
+        padding: 1px 15px !important;
     }
 }
 
