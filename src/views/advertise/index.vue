@@ -155,18 +155,16 @@
 /*eslint-disable*/
 import { ref,computed } from "vue"
 import { useRouter,useRoute } from "vue-router"
-import { useMobileStore } from '@/stores/index'
+import { useMobileStore,useLoadingStore } from '@/stores/index'
 import { advertiseList,advertiseDetail,advertiseCreate,advertiseEdit } from '@/api/advertise'
 import { uploadFile } from '@/api/file'
 import dialogView from "@/components/dialogView.vue"
 const router = useRouter()
 const route = useRoute()
 const mobileStore = useMobileStore()
-const loadStatus = ref(false)
 const uploadStatus = ref(false)
 const fileList = ref([])
 const totalCount = ref(0)
-const uploading = ref(false)
 const formItem = ref(null)
 const rules = ref({
     name: [
@@ -177,8 +175,8 @@ const rules = ref({
     ]
 })
 const form = ref({
-  name: '',
-  keyWord: '',
+    name: '',
+    keyWord: '',
 })
 // 1新增 2編輯
 const mode = ref(1)
@@ -207,6 +205,10 @@ const fileOption = ref([
         "value": 3
     }
 ])
+const loadingStore = useLoadingStore()
+const loadViewStatus = computed(() => {
+  return loadingStore.status
+})
 
 const isMobile = computed(() => {
   return mobileStore.isMobile
@@ -225,10 +227,11 @@ const editFile = (item) => {
 }
 
 const getUserDetail = async(num) => {
-    if(loadStatus.value){
+    if(loadViewStatus.value){
         return false
     }
-    loadStatus.value = true
+
+    loadingStore.openLoad()
 
     const payload = {
         "id":num
@@ -246,17 +249,17 @@ const getUserDetail = async(num) => {
             openUpload()
         }
     }).finally(()=>{
-        loadStatus.value = false
+        loadingStore.closeLoad()
     })
 }
 
 
 const getFileData = async() => {
-    if(loadStatus.value){
+    if(loadViewStatus.value){
         return false
     }
 
-    loadStatus.value = true
+    loadingStore.openLoad()
 
     await advertiseList().then((res) => {
         if(res.data.status){
@@ -264,7 +267,7 @@ const getFileData = async() => {
             totalCount.value = fileList.value.length
         }
     }).finally(()=>{
-        loadStatus.value = false
+        loadingStore.closeLoad()
     })
 
 }
@@ -298,13 +301,13 @@ const closeUpload = () => {
 }
 
 const upFile = async(event) => {
-    uploading.value = true
+    loadingStore.openLoad()
 
     fileMessage.value = '上傳中'
     const fileType = event.target.files[0].type.split('/')[1]
     if(!['jpg','png'].includes(fileType)){
         fileMessage.value = "檔案類型錯誤"
-        uploading.value = false
+        loadingStore.closeLoad()
         return false
     }
     
@@ -316,13 +319,13 @@ const upFile = async(event) => {
         if(res.data.status){
             fileData.value.pic = res.data.data.url
         }
-        uploading.value = false
+        loadingStore.closeLoad()
     })
 
 }
 
 const addFile = async() => {
-    if(uploading.value){
+    if(loadViewStatus.value){
        return false 
     }
 

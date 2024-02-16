@@ -140,7 +140,7 @@
                     <div class="w-full h-auto my-1 px-2 py-1 flex flex-wrap justify-end items-center">
                         <button
                             @click="saveEdit"
-                            class="w-auto bg-blue-500 hover:bg-blue-600 text-white font-bold mx-2 py-1 px-2 md:py-2 md:px-3 rounded">
+                            class="w-auto bg-blue-500 hover:bg-blue-600 text-white font-bold mx-2 py-1 px-2 md:py-2 md:px-3 rounded cursor-pointer">
                             {{ mode == 1 ? '新增' : '修改' }}
                         </button>
                     </div>
