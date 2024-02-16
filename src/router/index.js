@@ -4,8 +4,9 @@ import loginView from '../views/login/index.vue'
 import userView from '../views/user/index.vue'
 import advertiseView from '../views/advertise/index.vue'
 import errorView from '../views/errorView.vue'
-import { useLoginStore,useUserStore } from '@/stores/index'
+import { useLoginStore,useUserStore,useLoadingStore } from '@/stores/index'
 // import { checkToken } from '@/api/api'
+import { loginInformation } from '@/api/login'
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -50,18 +51,34 @@ const allow = ['loginView']
 //需權限進入
 const authorityList = ['userView']
 
-router.beforeEach((to, from) => {
+router.beforeEach(async(to, from) => {
   // console.log('to',to.name)
   const loginStore = useLoginStore()
   const userStore = useUserStore()
+  const loadingStore = useLoadingStore()
   if(!(allow.includes(to.name) || loginStore?.status)){
     return '/loginView'
   }
 
   if(loginStore?.status){
+    // console.log('userStore.information',userStore.information,userStore.information?.state)
+    if(!userStore.information?.state && (userStore.information?.state != 0)){
+      // console.log('get')
+      loadingStore.openLoad()
+      await loginInformation().then((res) => {
+        // console.log('loginInformation',res)
+        if(res.data.status){
+          userStore.setUserInformation(res.data.data)
+          // console.log('userStore',userStore.information)
+        }
+        loadingStore.closeLoad()
+      })
+    }
+
     if(authorityList.includes(to.name) && (userStore.information.state !== 2)){
       return '/'
     }
+
     // checkToken().then((res) => {
     //   // console.log('checkToken api',res)
     //   if(res.data.status){

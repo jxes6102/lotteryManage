@@ -68,15 +68,6 @@ onMounted(() => {
   setWidth()
 
   if(loginStore.status){
-    loadingStore.openLoad()
-    loginInformation().then((res) => {
-      // console.log('loginInformation',res)
-      if(res.data.status){
-        userStore.setUserInformation(res.data.data)
-        // console.log('userStore',userStore.information)
-      }
-      loadingStore.closeLoad()
-    })
 
     headerStore.openHeader()
     if(!isMobile.value){
