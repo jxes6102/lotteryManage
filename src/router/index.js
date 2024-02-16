@@ -1,9 +1,7 @@
 import { createRouter, createWebHistory,createWebHashHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import parentView from '../views/parent/index.vue'
 import loginView from '../views/login/index.vue'
 import userView from '../views/user/index.vue'
-import scheduleView from '../views/schedule/index.vue'
 import advertiseView from '../views/advertise/index.vue'
 import errorView from '../views/errorView.vue'
 import { useLoginStore,useUserStore } from '@/stores/index'
@@ -23,19 +21,9 @@ const router = createRouter({
       component: loginView 
     },
     { 
-      path: '/parentView',
-      name: 'parentView',
-      component: parentView 
-    },
-    { 
       path: '/userView',
       name: 'userView',
       component: userView 
-    },
-    { 
-      path: '/scheduleView',
-      name: 'scheduleView',
-      component: scheduleView 
     },
     { 
       path: '/advertiseView',

@@ -182,6 +182,31 @@ const form = ref({
 })
 // 1新增 2編輯
 const mode = ref(1)
+const fileMessage = ref('請上傳檔案')
+const fileData = ref({
+    "name": '',
+    "pic": '',
+    "url": '',
+    "state": 0
+})
+const fileOption = ref([
+    {
+        "label": "關閉",
+        "value": 0
+    },
+    {
+        "label": "上",
+        "value": 1
+    },
+    {
+        "label": "中",
+        "value": 2
+    },
+    {
+        "label": "下",
+        "value": 3
+    }
+])
 
 const isMobile = computed(() => {
   return mobileStore.isMobile
@@ -194,7 +219,6 @@ const createFile = () => {
 }
 
 const editFile = (item) => {
-
     mode.value = 2
     resetData()
     getUserDetail(item.row.id)
@@ -273,32 +297,6 @@ const closeUpload = () => {
     uploadStatus.value = false
 }
 
-const fileData = ref({
-    "name": '',
-    "pic": '',
-    "url": '',
-    "state": 0
-})
-const fileOption = ref([
-    {
-        "label": "關閉",
-        "value": 0
-    },
-    {
-        "label": "上",
-        "value": 1
-    },
-    {
-        "label": "中",
-        "value": 2
-    },
-    {
-        "label": "下",
-        "value": 3
-    }
-])
-
-const fileMessage = ref('請上傳檔案')
 const upFile = async(event) => {
     uploading.value = true
 

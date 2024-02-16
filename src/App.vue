@@ -15,7 +15,7 @@
     <RouterView
       :class="(!isMobile && menuStatus) ? 'ml-[200px] w-[calc(100%_-_200px)]' : 'w-[100%]'"
       class="transition-all duration-1000" />
-
+    <loadView v-if="loadViewStatus"></loadView>
   </div>
 </template>
 
@@ -26,7 +26,8 @@ import { onMounted,computed,watch } from 'vue'
 import { loginInformation } from '@/api/login'
 import headerView from './components/headerView.vue'
 import menuView from './components/menuView.vue'
-import { useMobileStore,useMenuStore,useheaderStore,useLoginStore,useUserStore } from './stores/index'
+import loadView from './components/loadView.vue'
+import { useMobileStore,useMenuStore,useheaderStore,useLoginStore,useUserStore,useLoadingStore } from './stores/index'
 import { useRouter } from "vue-router";
 
 const router = useRouter()
@@ -35,6 +36,7 @@ const menuStore = useMenuStore()
 const headerStore = useheaderStore()
 const loginStore = useLoginStore()
 const userStore = useUserStore()
+const loadingStore = useLoadingStore()
 
 const headerStatus = computed(() => {
   return headerStore.status
@@ -44,6 +46,9 @@ const menuStatus = computed(() => {
 })
 const isMobile = computed(() => {
   return mobileStore.isMobile
+})
+const loadViewStatus = computed(() => {
+  return loadingStore.status
 })
 const setWidth = () => {
   mobileStore.setMobile(window.innerWidth)
@@ -87,10 +92,6 @@ onMounted(() => {
   // });
 
 })
-
-
-
-
 
 watch(isMobile, (newVal,oldVal) => {
   if((newVal == true) && (oldVal == false)){

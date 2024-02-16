@@ -68,3 +68,14 @@ export const useUserStore = defineStore('user', () => {
     }
     return { information,setUserInformation,clearUserInformation }
 })
+
+export const useLoadingStore = defineStore('loading', () => {
+    const status = ref(false)
+    const openLoad = () => {
+        status.value = true
+    }
+    const closeLoad = () => {
+        status.value = false
+    }
+    return { status,openLoad,closeLoad }
+})
