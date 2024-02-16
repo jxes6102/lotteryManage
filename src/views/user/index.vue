@@ -154,14 +154,17 @@
 /*eslint-disable*/
 import { ref,computed } from "vue"
 import { useRouter,useRoute } from "vue-router"
-import { useMobileStore } from '@/stores/index'
+import { useMobileStore,useLoadingStore } from '@/stores/index'
 import { getUserList,userDetail,userCreate,userEdit } from '@/api/user'
 import dialogView from "@/components/dialogView.vue"
 const router = useRouter()
 const route = useRoute()
 const mobileStore = useMobileStore()
 const formItem = ref(null)
-const loadStatus = ref(false)
+const loadingStore = useLoadingStore()
+const loadViewStatus = computed(() => {
+  return loadingStore.status
+})
 const userData = ref({
     "account": '',
     "password": '',
@@ -174,8 +177,8 @@ const userList = ref([])
 const totalCount = ref(0)
 const page = ref(1)
 const form = ref({
-  name: '',
-  keyWord: '',
+    name: '',
+    keyWord: '',
 })
 const roleOption = ref([
     {
@@ -244,10 +247,10 @@ const editUser = (item) => {
 }
 
 const getUserDetail = async(num) => {
-    if(loadStatus.value){
+    if(loadViewStatus.value){
         return false
     }
-    loadStatus.value = true
+    loadingStore.openLoad()
 
     const payload = {
         "id":num
@@ -262,17 +265,17 @@ const getUserDetail = async(num) => {
             editStatus.value = true
         }
     }).finally(()=>{
-        loadStatus.value = false
+        loadingStore.closeLoad()
     })
 }
 
 
 const getUserData = async() => {
-    if(loadStatus.value){
+    if(loadViewStatus.value){
         return false
     }
 
-    loadStatus.value = true
+    loadingStore.openLoad()
 
     await getUserList().then((res) => {
         if(res.data.status){
@@ -280,7 +283,7 @@ const getUserData = async() => {
             totalCount.value = userList.value.length
         }
     }).finally(()=>{
-        loadStatus.value = false
+        loadingStore.closeLoad()
     })
 
 }

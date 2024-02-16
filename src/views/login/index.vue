@@ -63,16 +63,20 @@
 <script setup>
 /*eslint-disable*/
 import { doLogin } from '@/api/login'
-import { ref,computed,onMounted } from 'vue';
-import { useLoginStore,useMenuStore,useheaderStore,useMobileStore } from '@/stores/index'
+import { ref,computed } from 'vue';
+import { useLoginStore,useMenuStore,useheaderStore,useMobileStore,useLoadingStore } from '@/stores/index'
 import { useRouter } from "vue-router";
 const loginStore = useLoginStore()
 const menuStore = useMenuStore()
 const headerStore = useheaderStore()
 const router = useRouter()
 const mobileStore = useMobileStore()
+const loadingStore = useLoadingStore()
 const isMobile = computed(() => {
   return mobileStore.isMobile
+})
+const loadViewStatus = computed(() => {
+  return loadingStore.status
 })
 
 const captchaData = ref({})
@@ -89,8 +93,6 @@ const formItem = ref(null)
 const form = ref({
   account: '',
   password: '',
-//   checkNum:''
-  // phone: '',
 })
 
 const rules = ref({
@@ -102,50 +104,13 @@ const rules = ref({
         { required: true, message: '請輸入密碼', trigger: 'blur' },
         { min: 3, max: 15, message: 'Length should be 3 to 15', trigger: 'change' },
     ],
-    // checkNum: [
-    //     { required: true,message: '請輸入驗證碼',trigger: 'blur' },
-    //     { min: 4, message: 'Length should be 4', trigger: 'change' },
-    // ],
 })
 
-// const accountCheck = (rule, value, callback) => {
-//   if (value === '') {
-//     callback(new Error('請輸入帳號'))
-//   }else {
-//     callback()
-//   }
-// }
-
-// const passwordCheck = (rule, value, callback) => {
-//   if (value === '') {
-//     callback(new Error('請輸入密碼'))
-//   }else {
-//     callback()
-//   }
-// }
-
-// const checkNumCheck = (rule, value, callback) => {
-//   if (value === '') {
-//     callback(new Error('請輸入驗證碼'))
-//   }else {
-//     callback()
-//   }
-// }
-
-// const rules = reactive({
-//     account: [{ validator: accountCheck, trigger: 'blur' }],
-//     password: [{ validator: passwordCheck, trigger: 'blur' }],
-//     checkNum: [{ validator: checkNumCheck, trigger: 'blur' }],
-// })
-
 const send = async() => {
-    if (loadStatus) {
+    if (loadViewStatus.value) {
       return false
     }
     await formItem.value.validate((valid, fields) => {
-        // console.log('formItem',formItem.value)
-        // console.log('fields',fields)
-        // console.log('valid',valid)
 
         if (valid) {
             // console.log('submit!')
@@ -157,16 +122,8 @@ const send = async() => {
 }
 
 const loginMessage = ref('')
-let loadStatus = false
 const login = async() => {
-// teacher001
-//   let payload = {
-//       'account': form.value?.account,
-//       'password': form.value?.password,
-//       'captchaId': captchaData.value?.captchaId,
-//       'captchaCode': form.value?.checkNum
-//   }
-  loadStatus = true
+  loadingStore.openLoad()
 
   const formData = new FormData();
   formData.append("account", form.value?.account);
@@ -175,8 +132,6 @@ const login = async() => {
     account:form.value?.account,
     password:form.value?.password
   }
-//   formData.append("captchaId", captchaData.value?.captchaId);
-//   formData.append("captchaCode", form.value?.checkNum);
 
   await doLogin(payLoad).then((res) => {
       if(res.data.status){
@@ -192,7 +147,7 @@ const login = async() => {
           loginMessage.value = res.data.message
         //   console.log(res.data.message)
       }
-      loadStatus = false
+      loadingStore.closeLoad()
   })
 
 }
@@ -215,7 +170,6 @@ const lineLogin = () => {
     //         // window.location.href = res.data.data;
     //         openLink(res.data.data)
     //     }
-
     // })
     // https://access.line.me/oauth2/v2.1/login?returnUri=%2Foauth2%2Fv2.1%2Fauthorize%2Fconsent%3Fresponse_type%3Dcode%26client_id%3D2001937495%26redirect_uri%3Dhttps%253A%252F%252Fjxes6102.github.io%252Fbryte%252F%26state%3Da1561e4078dc03b657ac93195a9f68934fd9fae1622d8e5239ad87a8d7aabb8f%26scope%3Dprofile%26openId%3D&loginChannelId=2001937495&loginState=70feooN8nomIsavCwLnhJM
 }
