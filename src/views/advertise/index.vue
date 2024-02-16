@@ -141,7 +141,7 @@
                     <div class="w-full h-auto my-1 px-2 py-1 flex flex-wrap justify-end items-center">
                         <button
                             @click="addFile"
-                            class="w-auto bg-blue-500 hover:bg-blue-600 text-white font-bold mx-2 py-1 px-2 md:py-2 md:px-3 rounded">
+                            class="w-auto bg-blue-500 hover:bg-blue-600 text-white font-bold mx-2 py-1 px-2 md:py-2 md:px-3 rounded cursor-pointer">
                             {{ mode == 1 ? '新增' : '修改' }}
                         </button>
                     </div>
@@ -210,7 +210,6 @@ const getUserDetail = async(num) => {
         "id":num
     }
     await advertiseDetail(payload).then((res) => {
-        // console.log('res',res)
         if(res.data.status){
             fileData.value = {
                 "id": res.data.data.id,
@@ -219,7 +218,7 @@ const getUserDetail = async(num) => {
                 "url": res.data.data.url,
                 "state": res.data.data.state
             }
-            // console.log('fileData.value',fileData.value)
+
             openUpload()
         }
     }).finally(()=>{
@@ -236,11 +235,9 @@ const getFileData = async() => {
     loadStatus.value = true
 
     await advertiseList().then((res) => {
-        // console.log('res',res)
         if(res.data.status){
             fileList.value = res.data.data
             totalCount.value = fileList.value.length
-            // console.log('fileList',fileList.value)
         }
     }).finally(()=>{
         loadStatus.value = false
@@ -304,30 +301,22 @@ const fileOption = ref([
 const fileMessage = ref('請上傳檔案')
 const upFile = async(event) => {
     uploading.value = true
-    // console.log('event',event.target.files[0])
+
     fileMessage.value = '上傳中'
     const fileType = event.target.files[0].type.split('/')[1]
     if(!['jpg','png'].includes(fileType)){
-        // console.log('error')
         fileMessage.value = "檔案類型錯誤"
         uploading.value = false
         return false
     }
-    // console.log("file", event.target.files[0])
     
     const formData = new FormData();
     formData.append("tag", "advertising");
     formData.append("file", event.target.files[0]);
     await uploadFile(formData).then((res) => {
-        // console.log('res',res)
         fileMessage.value = res.data.message
         if(res.data.status){
-            // console.log('url',res.data.data.url)
-            // console.log('file_name',res.data.data.file_name)
             fileData.value.pic = res.data.data.url
-            // fileData.value.url = res.data.data.url
-            
-            // closeUpload()
         }
         uploading.value = false
     })
@@ -343,36 +332,40 @@ const addFile = async() => {
 
         if (valid) {
             if(mode.value == 1){
-                // console.log('add File',fileData.value)
-                await advertiseCreate(fileData.value).then((res) => {
-                    // console.log('res',res)
-                    fileMessage.value = res.data.message
-                    if(res.data.status){
-                        getFileData()
-                        closeUpload()
-                        fileMessage.value = '請上傳檔案'
-                    }
-                })
+                addAdvertise()
             }else if(mode.value == 2){
-                // console.log('edit File',fileData.value)
-                await advertiseEdit(fileData.value).then((res) => {
-                    // console.log('res',res)
-                    fileMessage.value = res.data.message
-                    if(res.data.status){
-                        getFileData()
-                        closeUpload()
-                        fileMessage.value = '請上傳檔案'
-                    }
-                        
-                })
+                editAdvertise()
             }
 
-            formItem.value.resetFields()
         } else {
             return false
         }
     })
 
+}
+
+const addAdvertise = async() => {
+    await advertiseCreate(fileData.value).then(async(res) => {
+        fileMessage.value = res.data.message
+        if(res.data.status){
+            await getFileData()
+            closeUpload()
+            fileMessage.value = '請上傳檔案'
+        }
+        formItem.value.resetFields()
+    })
+}
+
+const editAdvertise = async() => {
+    await advertiseEdit(fileData.value).then(async(res) => {
+        fileMessage.value = res.data.message
+        if(res.data.status){
+            await getFileData()
+            closeUpload()
+            fileMessage.value = '請上傳檔案'
+        }
+        formItem.value.resetFields() 
+    })
 }
 
 const init = async() => {

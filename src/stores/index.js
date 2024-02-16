@@ -61,7 +61,7 @@ export const useUserStore = defineStore('user', () => {
     const information = ref({})
     const setUserInformation = (value) => {
         information.value = value
-        console.log('information.value',information.value )
+        // console.log('information.value',information.value )
     }
     const clearUserInformation = () => {
         information.value = {}
