@@ -111,13 +111,13 @@
                                 </el-col>
                                 <el-col :span="1"></el-col>
                             </el-form-item>
-                            <!-- <el-form-item label="超連結位置">
+                            <el-form-item prop="url" label="超連結位置">
                                 <el-col :span="1"></el-col>
                                 <el-col :span="22">
                                     <el-input placeholder="" v-model="fileData.url" />
                                 </el-col>
                                 <el-col :span="1"></el-col>
-                            </el-form-item> -->
+                            </el-form-item>
                             <el-form-item label="廣告狀態">
                                 <el-col :span="1"></el-col>
                                 <el-col :span="22">
@@ -172,6 +172,9 @@ const rules = ref({
     ],
     pic: [
         { required: true, message: '請上傳檔案', trigger: 'blur' },
+    ],
+    url: [
+        { required: true, message: '請輸入連結', trigger: 'blur' },
     ]
 })
 const form = ref({
